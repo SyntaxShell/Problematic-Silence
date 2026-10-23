@@ -2,16 +2,32 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Problematic Silence</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <main class="shell">
-      <canvas id="game" aria-label="Problematic Silence"></canvas>
-      <div class="shell-watermark" aria-hidden="true">
-        <img src="watermark.jpeg" alt="" />
+      <div id="game-stage">
+        <canvas id="game" aria-label="Problematic Silence"></canvas>
+        
+        <div class="shell-watermark" aria-hidden="true">
+          <img src="watermark.jpeg" alt="" />
+        </div>
+
+        <!-- Mobile Touch Controls Overlay -->
+        <div id="touch-controls" class="touch-layer" aria-hidden="true">
+          <div class="d-pad">
+            <button id="btn-left" class="ctrl-btn" type="button" aria-label="Left">◀</button>
+            <button id="btn-right" class="ctrl-btn" type="button" aria-label="Right">▶</button>
+          </div>
+          <div class="action-pad">
+            <button id="btn-interact" class="ctrl-btn action" type="button" aria-label="Interact">YAAR</button>
+            <button id="btn-jump" class="ctrl-btn jump" type="button" aria-label="Jump">▲</button>
+          </div>
+        </div>
       </div>
+
       <section class="hud gameplay-ui" aria-label="Game status" aria-hidden="true">
         <div class="hud-brand">
           <div class="hud-brand-copy">
@@ -34,131 +50,10 @@
           </div>
           <div class="panel compact">
             <span>Relics</span>
-            <strong id="weaponValue">0</strong>
-          </div>
-          <div class="panel compact">
-            <span>Mode</span>
-            <strong id="modeValue">Solo</strong>
-          </div>
-          <div class="panel compact">
-            <span>Phase</span>
-            <strong id="phaseValue">I</strong>
-          </div>
-        </div>
-        <div class="meter-block">
-          <div class="meter-copy">
-            <span>Team Integrity</span>
-            <strong id="healthValue">100%</strong>
-          </div>
-          <div class="meter-track">
-            <div id="healthFill" class="meter-fill"></div>
+            <strong id="relicsValue">0/3</strong>
           </div>
         </div>
       </section>
-      <div id="boot" class="boot">
-        <section class="dashboard-card" aria-label="Game dashboard">
-          <div class="dashboard-brand">
-            <img
-              class="dashboard-logo"
-              src="Sleek wolf logo for SyntaxShell - Copy.png"
-              alt="SyntaxShell company logo"
-            />
-          </div>
-          <p id="bootKicker" class="boot-kicker">SyntaxShell Company</p>
-          <h2 id="bootTitle">Problematic Silence</h2>
-          <p id="bootSubtitle" class="dashboard-subtitle">
-            Founded by Rudra. Built for speed, defense, and chaos in the SyntaxShell arena.
-          </p>
-          <div class="dashboard-actions">
-            <button id="playButton" class="menu-button play-button" type="button">
-              Play
-            </button>
-            <div class="mode-selector" role="group" aria-label="Game mode">
-              <button
-                id="singleModeButton"
-                class="menu-button mode-button active"
-                type="button"
-                aria-pressed="true"
-              >
-                Solo
-              </button>
-              <button
-                id="coopModeButton"
-                class="menu-button mode-button"
-                type="button"
-                aria-pressed="false"
-              >
-                Co-op
-              </button>
-            </div>
-            <div class="dashboard-secondary">
-              <button id="settingsButton" class="menu-button settings-button" type="button">
-                Settings
-              </button>
-            </div>
-          </div>
-          <div id="settingsPanel" class="settings-panel" aria-hidden="true">
-            <div class="setting-row">
-              <span>Sound</span>
-              <button id="soundToggleButton" class="setting-toggle" type="button">
-                Sound On
-              </button>
-            </div>
-            <div class="setting-row">
-              <span>Effects</span>
-              <button id="effectsToggleButton" class="setting-toggle" type="button">
-                High FX
-              </button>
-            </div>
-          </div>
-          <p id="bootHint" class="hint">
-            Single Player: A / D or Left / Right move, W or Up jump, Space defend. Touch
-            controls support Left, Right, Jump, and Defend buttons.
-          </p>
-        </section>
-      </div>
-      <div id="sceneOverlay" class="scene-overlay" aria-hidden="true">
-        <section class="scene-card" aria-live="polite">
-          <div id="sceneFigure" class="scene-figure" aria-hidden="true">
-            <img id="scenePortrait" class="scene-portrait" alt="" />
-          </div>
-          <p id="sceneKicker" class="scene-kicker">Unknown Signal</p>
-          <h2 id="sceneTitle" class="scene-title">...</h2>
-          <p id="sceneBody" class="scene-body"></p>
-          <div id="sceneActions" class="scene-actions"></div>
-        </section>
-      </div>
-      <div class="brand-stamp gameplay-ui" aria-hidden="true">A SyntaxShell Game - Founded by Rudra</div>
-      <button
-        id="lifelineButton"
-        class="lifeline-button gameplay-ui"
-        type="button"
-        aria-label="Open lifeline settings"
-        aria-hidden="true"
-      >
-        Lifeline
-      </button>
-      <div class="mobile-move-controls gameplay-ui" aria-label="Move controls" aria-hidden="true">
-        <button id="moveLeftButton" class="action-button move-button" type="button" aria-label="Move left">
-          Left
-        </button>
-        <button id="moveRightButton" class="action-button move-button" type="button" aria-label="Move right">
-          Right
-        </button>
-      </div>
-      <div class="controls gameplay-ui" aria-hidden="true">
-        <button id="jumpButton" class="action-button secondary" type="button" aria-label="Jump">
-          Jump
-        </button>
-        <button
-          id="attackButton"
-          class="action-button"
-          type="button"
-          aria-label="Defend against the ghosts"
-        >
-          Defend
-        </button>
-      </div>
     </main>
     <script src="game.js"></script>
   </body>
