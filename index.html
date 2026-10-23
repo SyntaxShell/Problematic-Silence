@@ -1,60 +1,49 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Problematic Silence</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <main class="shell">
-      <div id="game-stage">
-        <canvas id="game" aria-label="Problematic Silence"></canvas>
-        
-        <div class="shell-watermark" aria-hidden="true">
-          <img src="watermark.jpeg" alt="" />
-        </div>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Syntax Protocol | Built by Syntax Shell</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container">
+    <header id="game-header">
+      <div class="brand">
+        <span class="prompt">&gt;_</span>
+        <span class="brand-title">Syntax Shell</span>
+        <span class="sub">// Protocol v1.0</span>
+      </div>
+      <div class="metrics">
+        <div class="metric-box"><span>SCORE</span><b id="score-el">0000</b></div>
+        <div class="metric-box"><span>FIREWALL</span><b id="health-el">100%</b></div>
+        <div class="metric-box"><span>WAVE</span><b id="wave-el">1</b></div>
+      </div>
+    </header>
 
-        <!-- Mobile Touch Controls Overlay -->
-        <div id="touch-controls" class="touch-layer" aria-hidden="true">
-          <div class="d-pad">
-            <button id="btn-left" class="ctrl-btn" type="button" aria-label="Left">◀</button>
-            <button id="btn-right" class="ctrl-btn" type="button" aria-label="Right">▶</button>
-          </div>
-          <div class="action-pad">
-            <button id="btn-interact" class="ctrl-btn action" type="button" aria-label="Interact">YAAR</button>
-            <button id="btn-jump" class="ctrl-btn jump" type="button" aria-label="Jump">▲</button>
-          </div>
+    <canvas id="canvas"></canvas>
+
+    <!-- Overlay for Start / Game Over -->
+    <div id="overlay" class="overlay-active">
+      <div class="card">
+        <h1 id="overlay-title">SYNTAX PROTOCOL</h1>
+        <p id="overlay-msg">Defend the core server architecture against bugs, memory leaks, and DDoS threats.</p>
+        <button id="start-btn" type="button">INITIALIZE SYSTEM</button>
+        <div class="agency-cta">
+          <p>Need custom full-stack web apps, tools, or automations?</p>
+          <a href="https://syntaxshell.github.io" target="_blank" rel="noopener">Hire Syntax Shell Studio &rarr;</a>
         </div>
       </div>
+    </div>
 
-      <section class="hud gameplay-ui" aria-label="Game status" aria-hidden="true">
-        <div class="hud-brand">
-          <div class="hud-brand-copy">
-            <div class="hud-brand-mark">
-              <img src="watermark.jpeg" alt="SyntaxShell wolf crest" />
-            </div>
-            <p class="eyebrow">SyntaxShell Company</p>
-            <h1>Problematic Silence</h1>
-          </div>
-          <p class="founder-mark">Founded by Rudra</p>
-        </div>
-        <div class="hud-panels">
-          <div class="panel">
-            <span>Score</span>
-            <strong id="scoreValue">000000</strong>
-          </div>
-          <div class="panel">
-            <span>High Score</span>
-            <strong id="highScoreValue">000000</strong>
-          </div>
-          <div class="panel compact">
-            <span>Relics</span>
-            <strong id="relicsValue">0/3</strong>
-          </div>
-        </div>
-      </section>
-    </main>
-    <script src="game.js"></script>
-  </body>
+    <!-- Mobile Touch Controls -->
+    <div id="mobile-controls">
+      <button id="btn-left" class="ctrl" type="button">&larr;</button>
+      <button id="btn-fire" class="ctrl fire" type="button">FIRE</button>
+      <button id="btn-right" class="ctrl" type="button">&rarr;</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
 </html>
