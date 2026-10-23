@@ -4,46 +4,503 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Syntax Protocol | Built by Syntax Shell</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #030712;
+      color: #f3f4f6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+    }
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 20%, #0f172a 0%, #030712 100%);
+    }
+    #game-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-prompt {
+      color: #38bdf8;
+      font-family: monospace;
+      font-weight: bold;
+    }
+    .brand-title {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+    .metrics {
+      display: flex;
+      gap: 12px;
+    }
+    .metric-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 6px 14px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+    .metric-card span {
+      font-size: 9px;
+      color: #94a3b8;
+      letter-spacing: 1px;
+    }
+    .metric-card strong {
+      font-size: 15px;
+      color: #38bdf8;
+      font-family: monospace;
+    }
+    canvas {
+      display: block;
+      background: #020617;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.85);
+      max-width: 100%;
+      max-height: 100%;
+    }
+    #overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 30;
+      padding: 20px;
+    }
+    #overlay.hidden {
+      display: none;
+    }
+    .modal {
+      background: #0b1120;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.15);
+      border-radius: 12px;
+      max-width: 420px;
+      width: 100%;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .modal h1 {
+      font-size: 24px;
+      color: #38bdf8;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .modal p {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    #start-btn {
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 1px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+    #start-btn:hover {
+      background: #38bdf8;
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+    }
+    .agency-link {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .agency-link p {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    .agency-link a {
+      color: #38bdf8;
+      font-size: 13px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    #touch-layer {
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      padding: 0 20px;
+      z-index: 20;
+    }
+    .touch-btn {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: bold;
+      width: 72px;
+      height: 64px;
+      border-radius: 12px;
+      touch-action: manipulation;
+      outline: none;
+    }
+    .touch-btn.fire {
+      width: 120px;
+      background: rgba(2, 132, 199, 0.35);
+      border-color: #38bdf8;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+    .touch-btn:active {
+      background: rgba(56, 189, 248, 0.6);
+      transform: scale(0.95);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      #touch-layer {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
   <div id="game-container">
     <header id="game-header">
       <div class="brand">
-        <span class="prompt">&gt;_</span>
+        <span class="brand-prompt">&gt;_</span>
         <span class="brand-title">Syntax Shell</span>
-        <span class="sub">// Protocol v1.0</span>
       </div>
       <div class="metrics">
-        <div class="metric-box"><span>SCORE</span><b id="score-el">0000</b></div>
-        <div class="metric-box"><span>FIREWALL</span><b id="health-el">100%</b></div>
-        <div class="metric-box"><span>WAVE</span><b id="wave-el">1</b></div>
+        <div class="metric-card"><span>SCORE</span><strong id="scoreVal">0000</strong></div>
+        <div class="metric-card"><span>FIREWALL</span><strong id="healthVal">100%</strong></div>
+        <div class="metric-card"><span>WAVE</span><strong id="waveVal">1</strong></div>
       </div>
     </header>
 
-    <canvas id="canvas"></canvas>
+    <canvas id="gameCanvas" width="960" height="540"></canvas>
 
-    <!-- Overlay for Start / Game Over -->
-    <div id="overlay" class="overlay-active">
-      <div class="card">
-        <h1 id="overlay-title">SYNTAX PROTOCOL</h1>
-        <p id="overlay-msg">Defend the core server architecture against bugs, memory leaks, and DDoS threats.</p>
+    <div id="overlay">
+      <div class="modal">
+        <h1 id="modalTitle">SYNTAX PROTOCOL</h1>
+        <p id="modalDesc">Defend server architecture nodes against memory leaks, malware, and DDoS threats.</p>
         <button id="start-btn" type="button">INITIALIZE SYSTEM</button>
-        <div class="agency-cta">
-          <p>Need custom full-stack web apps, tools, or automations?</p>
+        <div class="agency-link">
+          <p>Need custom full-stack web apps or workflow automations?</p>
           <a href="https://syntaxshell.github.io" target="_blank" rel="noopener">Hire Syntax Shell Studio &rarr;</a>
         </div>
       </div>
     </div>
 
-    <!-- Mobile Touch Controls -->
-    <div id="mobile-controls">
-      <button id="btn-left" class="ctrl" type="button">&larr;</button>
-      <button id="btn-fire" class="ctrl fire" type="button">FIRE</button>
-      <button id="btn-right" class="ctrl" type="button">&rarr;</button>
+    <div id="touch-layer">
+      <button id="btnLeft" class="touch-btn" type="button">&larr;</button>
+      <button id="btnFire" class="touch-btn fire" type="button">FIRE</button>
+      <button id="btnRight" class="touch-btn" type="button">&rarr;</button>
     </div>
   </div>
 
-  <script src="game.js"></script>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const scoreVal = document.getElementById("scoreVal");
+    const healthVal = document.getElementById("healthVal");
+    const waveVal = document.getElementById("waveVal");
+    const overlay = document.getElementById("overlay");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalDesc = document.getElementById("modalDesc");
+    const startBtn = document.getElementById("start-btn");
+
+    const V_W = 960;
+    const V_H = 540;
+
+    function resize() {
+      const scale = Math.min((window.innerWidth - 20) / V_W, (window.innerHeight - 20) / V_H, 1);
+      canvas.style.width = `${V_W * scale}px`;
+      canvas.style.height = `${V_H * scale}px`;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    // Procedural Audio
+    let audioCtx = null;
+    function playBeep(freq, type = "sine", dur = 0.08) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    let isPlaying = false;
+    let score = 0;
+    let health = 100;
+    let wave = 1;
+    let frame = 0;
+
+    const player = { x: V_W / 2, y: V_H - 60, w: 32, h: 28, speed: 7, vx: 0 };
+    let bullets = [];
+    let enemies = [];
+    let particles = [];
+    const keys = { left: false, right: false, fire: false };
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = true;
+      if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = true;
+      if (e.code === "Space" || e.code === "KeyW" || e.code === "ArrowUp") {
+        if (!keys.fire && isPlaying) shoot();
+        keys.fire = true;
+      }
+    });
+
+    window.addEventListener("keyup", (e) => {
+      if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = false;
+      if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = false;
+      if (e.code === "Space" || e.code === "KeyW" || e.code === "ArrowUp") keys.fire = false;
+    });
+
+    function bindTouch(id, onDown, onUp) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("touchstart", (e) => { e.preventDefault(); onDown(); }, { passive: false });
+      el.addEventListener("touchend", (e) => { e.preventDefault(); onUp(); }, { passive: false });
+      el.addEventListener("mousedown", onDown);
+      el.addEventListener("mouseup", onUp);
+    }
+    bindTouch("btnLeft", () => { keys.left = true; }, () => { keys.left = false; });
+    bindTouch("btnRight", () => { keys.right = true; }, () => { keys.right = false; });
+    bindTouch("btnFire", () => { if (isPlaying) shoot(); }, () => {});
+
+    function shoot() {
+      bullets.push({ x: player.x, y: player.y - 10, vy: -11 });
+      playBeep(520, "triangle", 0.06);
+    }
+
+    function spawnEnemy() {
+      const types = [
+        { label: "BUG", color: "#f59e0b", hp: 1, speed: 1.8 },
+        { label: "LEAK", color: "#ec4899", hp: 1, speed: 2.2 },
+        { label: "DDOS", color: "#ef4444", hp: 2, speed: 1.4 }
+      ];
+      const template = types[Math.floor(Math.random() * types.length)];
+      enemies.push({
+        x: Math.random() * (V_W - 80) + 40,
+        y: -20,
+        w: 36,
+        h: 24,
+        vy: template.speed + wave * 0.25,
+        ...template
+      });
+    }
+
+    function addExplosion(x, y, color = "#38bdf8") {
+      for (let i = 0; i < 10; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() - 0.5) * 5,
+          vy: (Math.random() - 0.5) * 5,
+          life: 20,
+          color
+        });
+      }
+    }
+
+    function startGame() {
+      score = 0;
+      health = 100;
+      wave = 1;
+      bullets = [];
+      enemies = [];
+      particles = [];
+      player.x = V_W / 2;
+      scoreVal.textContent = "0000";
+      healthVal.textContent = "100%";
+      waveVal.textContent = "1";
+      overlay.classList.add("hidden");
+      isPlaying = true;
+      playBeep(440, "sine", 0.12);
+    }
+
+    function gameOver() {
+      isPlaying = false;
+      modalTitle.textContent = "FIREWALL COMPROMISED";
+      modalDesc.textContent = `Breached at Wave ${wave}. Total Score: ${score}. System architecture protected.`;
+      startBtn.textContent = "REBOOT PROTOCOL";
+      overlay.classList.remove("hidden");
+      playBeep(180, "sawtooth", 0.25);
+    }
+
+    startBtn.addEventListener("click", startGame);
+
+    function update() {
+      if (!isPlaying) return;
+      frame++;
+      if (frame % Math.max(35, 80 - wave * 8) === 0) spawnEnemy();
+      if (frame % 700 === 0) {
+        wave++;
+        waveVal.textContent = String(wave);
+      }
+
+      if (keys.left) player.vx = -player.speed;
+      else if (keys.right) player.vx = player.speed;
+      else player.vx *= 0.72;
+
+      player.x += player.vx;
+      if (player.x < 30) player.x = 30;
+      if (player.x > V_W - 30) player.x = V_W - 30;
+
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].y += bullets[i].vy;
+        if (bullets[i].y < -10) bullets.splice(i, 1);
+      }
+
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const e = enemies[i];
+        e.y += e.vy;
+
+        for (let b = bullets.length - 1; b >= 0; b--) {
+          if (Math.hypot(bullets[b].x - e.x, bullets[b].y - e.y) < 24) {
+            bullets.splice(b, 1);
+            e.hp--;
+            if (e.hp <= 0) {
+              addExplosion(e.x, e.y, e.color);
+              enemies.splice(i, 1);
+              score += 100;
+              scoreVal.textContent = String(score).padStart(4, "0");
+              playBeep(620, "sine", 0.05);
+              break;
+            }
+          }
+        }
+
+        if (e && e.y > V_H - 30) {
+          enemies.splice(i, 1);
+          health -= 15;
+          healthVal.textContent = `${Math.max(0, health)}%`;
+          addExplosion(e.x, V_H - 30, "#ef4444");
+          playBeep(160, "square", 0.12);
+          if (health <= 0) gameOver();
+        }
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function render() {
+      ctx.fillStyle = "#020617";
+      ctx.fillRect(0, 0, V_W, V_H);
+
+      // Grid
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.04)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < V_W; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, V_H);
+        ctx.stroke();
+      }
+
+      // Defense perimeter line
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, V_H - 30);
+      ctx.lineTo(V_W, V_H - 30);
+      ctx.stroke();
+
+      // Player Ship
+      ctx.fillStyle = "#38bdf8";
+      ctx.shadowColor = "#38bdf8";
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.moveTo(player.x, player.y - player.h / 2);
+      ctx.lineTo(player.x - player.w / 2, player.y + player.h / 2);
+      ctx.lineTo(player.x + player.w / 2, player.y + player.h / 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Projectiles
+      ctx.fillStyle = "#34d399";
+      for (const b of bullets) {
+        ctx.fillRect(b.x - 2, b.y - 8, 4, 16);
+      }
+
+      // Threat nodes
+      for (const e of enemies) {
+        ctx.fillStyle = e.color;
+        ctx.shadowColor = e.color;
+        ctx.shadowBlur = 8;
+        ctx.fillRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h);
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = "#020617";
+        ctx.font = "bold 9px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(e.label, e.x, e.y + 3);
+      }
+
+      // Particles
+      for (const p of particles) {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 2.5, 2.5);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    setInterval(update, 1000 / 60);
+    render();
+  </script>
 </body>
 </html>
