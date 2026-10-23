@@ -2,505 +2,213 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Syntax Protocol | Built by Syntax Shell</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Syntax Protocol</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #030712; font-family: monospace; color: #fff; }
+    #wrapper { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 20%, #0f172a 0%, #030712 100%); }
+    canvas { display: block; background: #020617; border: 1px solid rgba(56, 189, 248, 0.3); max-width: 100%; max-height: 100%; }
+    
+    /* Touch controls for mobile / APK */
+    #touch-panel {
+      position: absolute; bottom: 20px; left: 0; width: 100%;
+      display: flex; justify-content: space-between; padding: 0 24px;
+      pointer-events: none; z-index: 10;
     }
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #030712;
-      color: #f3f4f6;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-    }
-    #game-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at 50% 20%, #0f172a 0%, #030712 100%);
-    }
-    #game-header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 10;
-      pointer-events: none;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .brand-prompt {
-      color: #38bdf8;
-      font-family: monospace;
-      font-weight: bold;
-    }
-    .brand-title {
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: 0.5px;
-      color: #ffffff;
-    }
-    .metrics {
-      display: flex;
-      gap: 12px;
-    }
-    .metric-card {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      padding: 6px 14px;
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      backdrop-filter: blur(4px);
-    }
-    .metric-card span {
-      font-size: 9px;
-      color: #94a3b8;
-      letter-spacing: 1px;
-    }
-    .metric-card strong {
-      font-size: 15px;
-      color: #38bdf8;
-      font-family: monospace;
-    }
-    canvas {
-      display: block;
-      background: #020617;
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.85);
-      max-width: 100%;
-      max-height: 100%;
-    }
-    #overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(3, 7, 18, 0.85);
-      backdrop-filter: blur(8px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 30;
-      padding: 20px;
-    }
-    #overlay.hidden {
-      display: none;
-    }
-    .modal {
-      background: #0b1120;
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      box-shadow: 0 0 35px rgba(56, 189, 248, 0.15);
-      border-radius: 12px;
-      max-width: 420px;
-      width: 100%;
-      padding: 32px 24px;
-      text-align: center;
-    }
-    .modal h1 {
-      font-size: 24px;
-      color: #38bdf8;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-    }
-    .modal p {
-      color: #94a3b8;
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 24px;
-    }
-    #start-btn {
-      background: #0284c7;
-      color: #ffffff;
-      border: none;
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 1px;
-      padding: 14px 28px;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      transition: all 0.2s ease;
-    }
-    #start-btn:hover {
-      background: #38bdf8;
-      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
-    }
-    .agency-link {
-      margin-top: 24px;
-      padding-top: 18px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .agency-link p {
-      font-size: 12px;
-      color: #64748b;
-      margin-bottom: 8px;
-    }
-    .agency-link a {
-      color: #38bdf8;
-      font-size: 13px;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    #touch-layer {
-      position: absolute;
-      bottom: 24px;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      padding: 0 20px;
-      z-index: 20;
-    }
-    .touch-btn {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      color: #ffffff;
-      font-size: 22px;
-      font-weight: bold;
-      width: 72px;
-      height: 64px;
-      border-radius: 12px;
+    .t-grp { display: flex; gap: 12px; pointer-events: auto; }
+    .btn {
+      width: 68px; height: 68px; border-radius: 14px;
+      background: rgba(15, 23, 42, 0.85); border: 1.5px solid rgba(56, 189, 248, 0.4);
+      color: #38bdf8; font-size: 24px; font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
       touch-action: manipulation;
-      outline: none;
     }
-    .touch-btn.fire {
-      width: 120px;
-      background: rgba(2, 132, 199, 0.35);
-      border-color: #38bdf8;
-      font-size: 14px;
-      letter-spacing: 1px;
+    .btn.fire { width: 100px; background: rgba(2, 132, 199, 0.3); border-color: #38bdf8; color: #fff; font-size: 15px; letter-spacing: 1px; }
+    .btn:active { background: rgba(56, 189, 248, 0.5); transform: scale(0.94); }
+
+    /* UI Overlay */
+    #start-screen {
+      position: absolute; inset: 0; background: rgba(3, 7, 18, 0.9);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px; text-align: center; z-index: 20;
     }
-    .touch-btn:active {
-      background: rgba(56, 189, 248, 0.6);
-      transform: scale(0.95);
-    }
-    @media (hover: hover) and (pointer: fine) {
-      #touch-layer {
-        display: none;
-      }
+    #start-screen h1 { font-size: 26px; color: #38bdf8; margin-bottom: 12px; letter-spacing: 1px; }
+    #start-screen p { color: #94a3b8; font-size: 13px; max-width: 320px; line-height: 1.5; margin-bottom: 24px; }
+    #play-btn {
+      background: #0284c7; color: #fff; border: none; font-size: 14px;
+      font-weight: bold; padding: 14px 28px; border-radius: 8px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
     }
   </style>
 </head>
 <body>
-  <div id="game-container">
-    <header id="game-header">
-      <div class="brand">
-        <span class="brand-prompt">&gt;_</span>
-        <span class="brand-title">Syntax Shell</span>
-      </div>
-      <div class="metrics">
-        <div class="metric-card"><span>SCORE</span><strong id="scoreVal">0000</strong></div>
-        <div class="metric-card"><span>FIREWALL</span><strong id="healthVal">100%</strong></div>
-        <div class="metric-card"><span>WAVE</span><strong id="waveVal">1</strong></div>
-      </div>
-    </header>
-
-    <canvas id="gameCanvas" width="960" height="540"></canvas>
-
-    <div id="overlay">
-      <div class="modal">
-        <h1 id="modalTitle">SYNTAX PROTOCOL</h1>
-        <p id="modalDesc">Defend server architecture nodes against memory leaks, malware, and DDoS threats.</p>
-        <button id="start-btn" type="button">INITIALIZE SYSTEM</button>
-        <div class="agency-link">
-          <p>Need custom full-stack web apps or workflow automations?</p>
-          <a href="https://syntaxshell.github.io" target="_blank" rel="noopener">Hire Syntax Shell Studio &rarr;</a>
-        </div>
-      </div>
+  <div id="wrapper">
+    <canvas id="view" width="480" height="720"></canvas>
+    
+    <div id="start-screen">
+      <h1>SYNTAX PROTOCOL</h1>
+      <p>Mobile Cyber Defense Node<br>Defend against packet leaks and malicious bots.</p>
+      <button id="play-btn" type="button">START MISSION</button>
     </div>
 
-    <div id="touch-layer">
-      <button id="btnLeft" class="touch-btn" type="button">&larr;</button>
-      <button id="btnFire" class="touch-btn fire" type="button">FIRE</button>
-      <button id="btnRight" class="touch-btn" type="button">&rarr;</button>
+    <div id="touch-panel">
+      <div class="t-grp">
+        <button id="lBtn" class="btn" type="button">◀</button>
+        <button id="rBtn" class="btn" type="button">▶</button>
+      </div>
+      <div class="t-grp">
+        <button id="fBtn" class="btn fire" type="button">DEFEND</button>
+      </div>
     </div>
   </div>
 
   <script>
-    const canvas = document.getElementById("gameCanvas");
+    const canvas = document.getElementById("view");
     const ctx = canvas.getContext("2d");
+    const startScreen = document.getElementById("start-screen");
+    const playBtn = document.getElementById("play-btn");
 
-    const scoreVal = document.getElementById("scoreVal");
-    const healthVal = document.getElementById("healthVal");
-    const waveVal = document.getElementById("waveVal");
-    const overlay = document.getElementById("overlay");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalDesc = document.getElementById("modalDesc");
-    const startBtn = document.getElementById("start-btn");
-
-    const V_W = 960;
-    const V_H = 540;
-
-    function resize() {
-      const scale = Math.min((window.innerWidth - 20) / V_W, (window.innerHeight - 20) / V_H, 1);
-      canvas.style.width = `${V_W * scale}px`;
-      canvas.style.height = `${V_H * scale}px`;
+    function fit() {
+      const scale = Math.min(window.innerWidth / 480, window.innerHeight / 720);
+      canvas.style.width = (480 * scale) + "px";
+      canvas.style.height = (720 * scale) + "px";
     }
-    window.addEventListener("resize", resize);
-    resize();
+    window.addEventListener("resize", fit);
+    fit();
 
-    // Procedural Audio
-    let audioCtx = null;
-    function playBeep(freq, type = "sine", dur = 0.08) {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === "suspended") audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-        osc.start();
-        osc.stop(audioCtx.currentTime + dur);
-      } catch (e) {}
-    }
-
-    let isPlaying = false;
+    let active = false;
     let score = 0;
     let health = 100;
-    let wave = 1;
     let frame = 0;
 
-    const player = { x: V_W / 2, y: V_H - 60, w: 32, h: 28, speed: 7, vx: 0 };
+    const ship = { x: 240, y: 640, w: 32, h: 28, speed: 6, vx: 0 };
     let bullets = [];
-    let enemies = [];
-    let particles = [];
-    const keys = { left: false, right: false, fire: false };
+    let targets = [];
+    const keys = { l: false, r: false };
+
+    function bind(id, start, stop) {
+      const el = document.getElementById(id);
+      el.addEventListener("touchstart", (e) => { e.preventDefault(); start(); }, { passive: false });
+      el.addEventListener("touchend", (e) => { e.preventDefault(); stop(); }, { passive: false });
+      el.addEventListener("mousedown", start);
+      el.addEventListener("mouseup", stop);
+    }
+    bind("lBtn", () => keys.l = true, () => keys.l = false);
+    bind("rBtn", () => keys.r = true, () => keys.r = false);
+    bind("fBtn", () => shoot(), () => {});
 
     window.addEventListener("keydown", (e) => {
-      if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = true;
-      if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = true;
-      if (e.code === "Space" || e.code === "KeyW" || e.code === "ArrowUp") {
-        if (!keys.fire && isPlaying) shoot();
-        keys.fire = true;
-      }
+      if (e.code === "ArrowLeft" || e.code === "KeyA") keys.l = true;
+      if (e.code === "ArrowRight" || e.code === "KeyD") keys.r = true;
+      if (e.code === "Space") shoot();
     });
-
     window.addEventListener("keyup", (e) => {
-      if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = false;
-      if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = false;
-      if (e.code === "Space" || e.code === "KeyW" || e.code === "ArrowUp") keys.fire = false;
+      if (e.code === "ArrowLeft" || e.code === "KeyA") keys.l = false;
+      if (e.code === "ArrowRight" || e.code === "KeyD") keys.r = false;
     });
-
-    function bindTouch(id, onDown, onUp) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener("touchstart", (e) => { e.preventDefault(); onDown(); }, { passive: false });
-      el.addEventListener("touchend", (e) => { e.preventDefault(); onUp(); }, { passive: false });
-      el.addEventListener("mousedown", onDown);
-      el.addEventListener("mouseup", onUp);
-    }
-    bindTouch("btnLeft", () => { keys.left = true; }, () => { keys.left = false; });
-    bindTouch("btnRight", () => { keys.right = true; }, () => { keys.right = false; });
-    bindTouch("btnFire", () => { if (isPlaying) shoot(); }, () => {});
 
     function shoot() {
-      bullets.push({ x: player.x, y: player.y - 10, vy: -11 });
-      playBeep(520, "triangle", 0.06);
+      if (!active) return;
+      bullets.push({ x: ship.x, y: ship.y - 12 });
+      if (navigator.vibrate) navigator.vibrate(15);
     }
 
-    function spawnEnemy() {
-      const types = [
-        { label: "BUG", color: "#f59e0b", hp: 1, speed: 1.8 },
-        { label: "LEAK", color: "#ec4899", hp: 1, speed: 2.2 },
-        { label: "DDOS", color: "#ef4444", hp: 2, speed: 1.4 }
-      ];
-      const template = types[Math.floor(Math.random() * types.length)];
-      enemies.push({
-        x: Math.random() * (V_W - 80) + 40,
-        y: -20,
-        w: 36,
-        h: 24,
-        vy: template.speed + wave * 0.25,
-        ...template
-      });
-    }
+    playBtn.addEventListener("click", () => {
+      score = 0; health = 100; bullets = []; targets = [];
+      ship.x = 240; active = true;
+      startScreen.style.display = "none";
+    });
 
-    function addExplosion(x, y, color = "#38bdf8") {
-      for (let i = 0; i < 10; i++) {
-        particles.push({
-          x, y,
-          vx: (Math.random() - 0.5) * 5,
-          vy: (Math.random() - 0.5) * 5,
-          life: 20,
-          color
-        });
-      }
-    }
+    function tick() {
+      if (active) {
+        frame++;
+        if (keys.l) ship.vx = -ship.speed;
+        else if (keys.r) ship.vx = ship.speed;
+        else ship.vx *= 0.7;
 
-    function startGame() {
-      score = 0;
-      health = 100;
-      wave = 1;
-      bullets = [];
-      enemies = [];
-      particles = [];
-      player.x = V_W / 2;
-      scoreVal.textContent = "0000";
-      healthVal.textContent = "100%";
-      waveVal.textContent = "1";
-      overlay.classList.add("hidden");
-      isPlaying = true;
-      playBeep(440, "sine", 0.12);
-    }
+        ship.x += ship.vx;
+        if (ship.x < 24) ship.x = 24;
+        if (ship.x > 456) ship.x = 456;
 
-    function gameOver() {
-      isPlaying = false;
-      modalTitle.textContent = "FIREWALL COMPROMISED";
-      modalDesc.textContent = `Breached at Wave ${wave}. Total Score: ${score}. System architecture protected.`;
-      startBtn.textContent = "REBOOT PROTOCOL";
-      overlay.classList.remove("hidden");
-      playBeep(180, "sawtooth", 0.25);
-    }
+        if (frame % 45 === 0) {
+          targets.push({
+            x: Math.random() * 400 + 40,
+            y: -20,
+            speed: Math.random() * 2 + 2,
+            type: Math.random() > 0.5 ? "LEAK" : "BUG"
+          });
+        }
 
-    startBtn.addEventListener("click", startGame);
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          bullets[i].y -= 10;
+          if (bullets[i].y < -10) bullets.splice(i, 1);
+        }
 
-    function update() {
-      if (!isPlaying) return;
-      frame++;
-      if (frame % Math.max(35, 80 - wave * 8) === 0) spawnEnemy();
-      if (frame % 700 === 0) {
-        wave++;
-        waveVal.textContent = String(wave);
-      }
+        for (let i = targets.length - 1; i >= 0; i--) {
+          const t = targets[i];
+          t.y += t.speed;
 
-      if (keys.left) player.vx = -player.speed;
-      else if (keys.right) player.vx = player.speed;
-      else player.vx *= 0.72;
-
-      player.x += player.vx;
-      if (player.x < 30) player.x = 30;
-      if (player.x > V_W - 30) player.x = V_W - 30;
-
-      for (let i = bullets.length - 1; i >= 0; i--) {
-        bullets[i].y += bullets[i].vy;
-        if (bullets[i].y < -10) bullets.splice(i, 1);
-      }
-
-      for (let i = enemies.length - 1; i >= 0; i--) {
-        const e = enemies[i];
-        e.y += e.vy;
-
-        for (let b = bullets.length - 1; b >= 0; b--) {
-          if (Math.hypot(bullets[b].x - e.x, bullets[b].y - e.y) < 24) {
-            bullets.splice(b, 1);
-            e.hp--;
-            if (e.hp <= 0) {
-              addExplosion(e.x, e.y, e.color);
-              enemies.splice(i, 1);
+          for (let b = bullets.length - 1; b >= 0; b--) {
+            if (Math.hypot(bullets[b].x - t.x, bullets[b].y - t.y) < 20) {
+              bullets.splice(b, 1);
+              targets.splice(i, 1);
               score += 100;
-              scoreVal.textContent = String(score).padStart(4, "0");
-              playBeep(620, "sine", 0.05);
               break;
             }
           }
-        }
 
-        if (e && e.y > V_H - 30) {
-          enemies.splice(i, 1);
-          health -= 15;
-          healthVal.textContent = `${Math.max(0, health)}%`;
-          addExplosion(e.x, V_H - 30, "#ef4444");
-          playBeep(160, "square", 0.12);
-          if (health <= 0) gameOver();
+          if (t && t.y > 670) {
+            targets.splice(i, 1);
+            health -= 10;
+            if (health <= 0) {
+              active = false;
+              startScreen.style.display = "flex";
+              startScreen.querySelector("h1").textContent = "NODE COMPROMISED";
+              startScreen.querySelector("p").innerHTML = `Score: ${score}<br>Architecture shielded.`;
+              playBtn.textContent = "REBOOT SYSTEM";
+            }
+          }
         }
       }
 
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life--;
-        if (p.life <= 0) particles.splice(i, 1);
-      }
-    }
-
-    function render() {
+      // Draw
       ctx.fillStyle = "#020617";
-      ctx.fillRect(0, 0, V_W, V_H);
+      ctx.fillRect(0, 0, 480, 720);
 
-      // Grid
-      ctx.strokeStyle = "rgba(56, 189, 248, 0.04)";
-      ctx.lineWidth = 1;
-      for (let x = 0; x < V_W; x += 40) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, V_H);
-        ctx.stroke();
-      }
-
-      // Defense perimeter line
-      ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, V_H - 30);
-      ctx.lineTo(V_W, V_H - 30);
-      ctx.stroke();
-
-      // Player Ship
+      // HUD
       ctx.fillStyle = "#38bdf8";
-      ctx.shadowColor = "#38bdf8";
-      ctx.shadowBlur = 10;
+      ctx.font = "14px monospace";
+      ctx.fillText(`SCORE: ${score}`, 20, 32);
+      ctx.fillText(`FIREWALL: ${health}%`, 320, 32);
+
+      // Player
+      ctx.fillStyle = "#38bdf8";
       ctx.beginPath();
-      ctx.moveTo(player.x, player.y - player.h / 2);
-      ctx.lineTo(player.x - player.w / 2, player.y + player.h / 2);
-      ctx.lineTo(player.x + player.w / 2, player.y + player.h / 2);
+      ctx.moveTo(ship.x, ship.y - 14);
+      ctx.lineTo(ship.x - 16, ship.y + 14);
+      ctx.lineTo(ship.x + 16, ship.y + 14);
       ctx.closePath();
       ctx.fill();
-      ctx.shadowBlur = 0;
 
-      // Projectiles
+      // Bullets
       ctx.fillStyle = "#34d399";
-      for (const b of bullets) {
-        ctx.fillRect(b.x - 2, b.y - 8, 4, 16);
-      }
+      for (const b of bullets) ctx.fillRect(b.x - 2, b.y - 8, 4, 12);
 
-      // Threat nodes
-      for (const e of enemies) {
-        ctx.fillStyle = e.color;
-        ctx.shadowColor = e.color;
-        ctx.shadowBlur = 8;
-        ctx.fillRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h);
-        ctx.shadowBlur = 0;
-
+      // Enemies
+      for (const t of targets) {
+        ctx.fillStyle = t.type === "BUG" ? "#f59e0b" : "#ef4444";
+        ctx.fillRect(t.x - 14, t.y - 12, 28, 24);
         ctx.fillStyle = "#020617";
         ctx.font = "bold 9px monospace";
         ctx.textAlign = "center";
-        ctx.fillText(e.label, e.x, e.y + 3);
+        ctx.fillText(t.type, t.x, t.y + 4);
+        ctx.textAlign = "start";
       }
 
-      // Particles
-      for (const p of particles) {
-        ctx.fillStyle = p.color;
-        ctx.fillRect(p.x, p.y, 2.5, 2.5);
-      }
-
-      requestAnimationFrame(render);
+      requestAnimationFrame(tick);
     }
-
-    setInterval(update, 1000 / 60);
-    render();
+    tick();
   </script>
 </body>
 </html>
